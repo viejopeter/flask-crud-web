@@ -72,6 +72,22 @@ def delete_transaction(transaction_id):
     # Redirect to the transactions list page after deleting the transaction
     return redirect(url_for("get_transactions"))
 
+@app.route("/search", methods=['POST','GET'])
+def search_transactions():
+    if request.method == 'POST':
+         minimum = float(request.form['min_amount'])
+         maximum = float(request.form['max_amount'])
+         filtered_transactions = [transaction for transaction in transactions if minimum <= transaction['amount'] <= maximum]
+         return render_template("transactions.html",transactions=filtered_transactions)
+    elif request.method == 'GET':
+        return render_template("search.html")
+    return {"message":"Transaction not found"},400
+
+@app.route("/balance")
+def balance():
+    sum_balance = sum(float(transaction['amount']) for transaction in transactions)
+    str_balance = f"Total Balance: {sum_balance}"
+    return render_template("transactions.html",transactions=transactions,str_balance=str_balance)
 # Run the Flask app
 if __name__=='__main__':
     app.run(debug=True)
